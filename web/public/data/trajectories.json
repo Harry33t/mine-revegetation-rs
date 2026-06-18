@@ -1,0 +1,154 @@
+{
+  "alcoa_huntly_rehab_trajectory": [
+    {
+      "year": 2019,
+      "mean_ndvi": 0.18170048,
+      "veg_cover_frac": 0.0,
+      "recovery_fraction": 0.0
+    },
+    {
+      "year": 2020,
+      "mean_ndvi": 0.2118565,
+      "veg_cover_frac": 0.0390976428956996,
+      "recovery_fraction": 0.051392168
+    },
+    {
+      "year": 2021,
+      "mean_ndvi": 0.2516568,
+      "veg_cover_frac": 0.146869189707911,
+      "recovery_fraction": 0.11922022
+    },
+    {
+      "year": 2022,
+      "mean_ndvi": 0.2641224,
+      "veg_cover_frac": 0.1560007197265039,
+      "recovery_fraction": 0.1404642
+    },
+    {
+      "year": 2023,
+      "mean_ndvi": 0.2917032,
+      "veg_cover_frac": 0.2135413542853715,
+      "recovery_fraction": 0.18746766
+    },
+    {
+      "year": 2024,
+      "mean_ndvi": 0.3089782,
+      "veg_cover_frac": 0.2688028549151322,
+      "recovery_fraction": 0.21690789
+    }
+  ],
+  "alcoa_huntly_trajectory": [
+    {
+      "year": 2019,
+      "mean_ndvi": 0.67870104,
+      "veg_cover_frac": 0.9055056297336544,
+      "recovery_fraction": 0.55561346
+    },
+    {
+      "year": 2020,
+      "mean_ndvi": 0.6493486,
+      "veg_cover_frac": 0.910792142262284,
+      "recovery_fraction": 0.0
+    },
+    {
+      "year": 2021,
+      "mean_ndvi": 0.70736647,
+      "veg_cover_frac": 0.927962270472762,
+      "recovery_fraction": 1.0
+    },
+    {
+      "year": 2022,
+      "mean_ndvi": 0.6866105,
+      "veg_cover_frac": 0.9229346101764004,
+      "recovery_fraction": 0.7053323
+    },
+    {
+      "year": 2023,
+      "mean_ndvi": 0.6804939,
+      "veg_cover_frac": 0.928718868936704,
+      "recovery_fraction": 0.5895504
+    },
+    {
+      "year": 2024,
+      "mean_ndvi": 0.6548347,
+      "veg_cover_frac": 0.9145817873262804,
+      "recovery_fraction": 0.103846096
+    }
+  ],
+  "mt_owen_rehab_trajectory": [
+    {
+      "year": 2019,
+      "mean_ndvi": 0.28120622,
+      "veg_cover_frac": 0.0,
+      "recovery_fraction": 0.0
+    },
+    {
+      "year": 2020,
+      "mean_ndvi": 0.4226919,
+      "veg_cover_frac": 0.6444746110632491,
+      "recovery_fraction": 0.3296013
+    },
+    {
+      "year": 2021,
+      "mean_ndvi": 0.41397318,
+      "veg_cover_frac": 0.6311361554571556,
+      "recovery_fraction": 0.30929035
+    },
+    {
+      "year": 2022,
+      "mean_ndvi": 0.4401323,
+      "veg_cover_frac": 0.6993049094977545,
+      "recovery_fraction": 0.37022993
+    },
+    {
+      "year": 2023,
+      "mean_ndvi": 0.31981274,
+      "veg_cover_frac": 0.1087919129251856,
+      "recovery_fraction": 0.089936726
+    },
+    {
+      "year": 2024,
+      "mean_ndvi": 0.42409936,
+      "veg_cover_frac": 0.6462893864310422,
+      "recovery_fraction": 0.33288002
+    }
+  ],
+  "ranger_rehab_trajectory": [
+    {
+      "year": 2019,
+      "mean_ndvi": 0.29339752,
+      "veg_cover_frac": 0.0,
+      "recovery_fraction": 0.0
+    },
+    {
+      "year": 2020,
+      "mean_ndvi": 0.31382734,
+      "veg_cover_frac": 0.0597922059880367,
+      "recovery_fraction": 0.067809135
+    },
+    {
+      "year": 2021,
+      "mean_ndvi": 0.34210202,
+      "veg_cover_frac": 0.1811264903970741,
+      "recovery_fraction": 0.16165635
+    },
+    {
+      "year": 2022,
+      "mean_ndvi": 0.3014852,
+      "veg_cover_frac": 0.0648628287021823,
+      "recovery_fraction": 0.026844073
+    },
+    {
+      "year": 2023,
+      "mean_ndvi": 0.29256594,
+      "veg_cover_frac": 0.0495915019583326,
+      "recovery_fraction": 0.0
+    },
+    {
+      "year": 2024,
+      "mean_ndvi": 0.30977142,
+      "veg_cover_frac": 0.0963229063927489,
+      "recovery_fraction": 0.054347035
+    }
+  ]
+}

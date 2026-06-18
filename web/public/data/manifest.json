@@ -1,0 +1,22 @@
+{
+  "assets": [
+    "alcoa_huntly_s2_rgb.png",
+    "alcoa_huntly_weak_label.png",
+    "alcoa_huntly_rehab_footprint.png",
+    "alcoa_huntly_bridge_structure_vs_greenness.png",
+    "alcoa_huntly_bridge_chm_1m.png",
+    "alcoa_huntly_bridge_canopyfrac_10m.png",
+    "alcoa_huntly_bridge_s2_ndvi_10m.png",
+    "seg_3site_sample.png",
+    "label_efficiency.png",
+    "transfer_matrix.png"
+  ],
+  "trajectories": [
+    "alcoa_huntly_rehab_trajectory",
+    "alcoa_huntly_trajectory",
+    "mt_owen_rehab_trajectory",
+    "ranger_rehab_trajectory"
+  ],
+  "has_label_efficiency": true,
+  "has_transfer_matrix": true
+}

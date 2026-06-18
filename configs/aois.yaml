@@ -1,0 +1,56 @@
+# Areas of interest for the revegetation-monitoring demo.
+#
+# Two roles:
+#   - track == "satellite": Australian rehab-mine AOIs. Sentinel-2 time series only
+#     (no co-located fine-scale data). Used for weak-supervised segmentation +
+#     restoration trajectory.
+#   - track == "bridge": NZ AOIs with co-located LINZ aerial + 1 m LiDAR (real CHM)
+#     AND Sentinel-2. The ONLY place a validatable drone/aerial -> satellite scale
+#     bridge can be built (resample fine labels to 10 m, supervise/validate S2).
+#
+# bbox = [west, south, east, north] in EPSG:4326 (lon/lat).
+# NOTE: Australian bboxes are APPROXIMATE centroids (~5 km boxes). Verify against
+# the real disturbance footprint on the source portal before clipping for analysis.
+
+aois:
+  alcoa_huntly:
+    track: satellite
+    label: "Alcoa Huntly bauxite rehab (WA, jarrah forest)"
+    bbox: [116.05, -32.62, 116.18, -32.50]
+    crs: "EPSG:4326"
+    mineral: bauxite
+    note: "Strongest revegetation signal; ~35 yr progressive rehab chronosequence."
+
+  ranger:
+    track: satellite
+    label: "Ranger uranium mine rehab (NT, Kakadu enclave)"
+    bbox: [132.88, -12.72, 132.98, -12.64]
+    crs: "EPSG:4326"
+    mineral: uranium
+    note: "Mining ceased 2021; full-time rehab ongoing."
+
+  mt_owen:
+    track: satellite
+    label: "Mt Owen / Ravensworth coal rehab (NSW, Hunter Valley)"
+    bbox: [151.05, -32.46, 151.18, -32.36]
+    crs: "EPSG:4326"
+    mineral: coal
+    note: "Progressive rehab; NSW has ~50cm CC-BY aerial + likely 1m LiDAR."
+
+  iluka_eneabba:
+    track: satellite
+    label: "Iluka Eneabba mineral sands rehab (WA)"
+    bbox: [115.24, -29.86, 115.36, -29.74]
+    crs: "EPSG:4326"
+    mineral: mineral_sands
+    note: "Rehab to native kwongan + agriculture."
+
+  # NZ bridge AOI. city == cities.yaml key consumed by the vendored nz_canopy loaders
+  # (LINZ aerial + DSM/DEM -> real 1 m CHM). bbox drives the Sentinel-2 pull.
+  tauranga_bridge:
+    track: bridge
+    label: "Tauranga (NZ) — co-located LINZ aerial + 1m LiDAR + Sentinel-2"
+    city: tauranga
+    bbox: [176.12, -37.74, 176.22, -37.66]
+    crs: "EPSG:4326"
+    note: "Validatable scale bridge: aerial+real CHM -> resample to 10m -> S2."

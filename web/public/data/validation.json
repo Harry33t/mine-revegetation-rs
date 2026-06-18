@@ -1,0 +1,27 @@
+{
+  "per_site": {
+    "alcoa_huntly": {
+      "kappa": 0.729,
+      "overall_agreement": 0.983,
+      "n_pixels": 1653453
+    },
+    "ranger": {
+      "kappa": 0.793,
+      "overall_agreement": 0.974,
+      "n_pixels": 978930
+    },
+    "mt_owen": {
+      "kappa": 0.723,
+      "overall_agreement": 0.945,
+      "n_pixels": 1405833
+    }
+  },
+  "pooled": {
+    "kappa": 0.745,
+    "overall_agreement": 0.967,
+    "n_pixels": 4038216
+  },
+  "reference": "ESA WorldCover 2021 (10 m)",
+  "scheme": "vegetation/bare/water",
+  "year": "2021"
+}

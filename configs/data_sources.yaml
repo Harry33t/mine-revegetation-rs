@@ -1,0 +1,69 @@
+# LINZ file naming and structural patterns.
+# The migration script (migrate_from_resource.py) discovers layer folders by
+# SUBSTRING keyword (not exact pattern), so the 2026-05-30 re-download works
+# despite naming changes:
+#   - LiDAR is now REGION-specific, not the national layer, e.g.
+#       canterbury-christchurch-lidar-1m-dsm-2024-2025
+#       wellington-hutt-city-lidar-1m-{dsm,dem}-2025
+#       bay-of-plenty-tauranga-lidar-1m-{dsm,dem}-2025
+#       auckland-part-1-lidar-1m-{dsm,dem}-2024
+#   - Aerial resolution varies: christchurch/wellington/auckland = 0075m,
+#       tauranga = 01m. Match keyword "urban-aerial-photos".
+# The zips are now 7-layer ("lds-new-zealand-7layers-GTiff-JPEG-SHP"),
+# extracted per-city into data/_staging/<city>/ then migrated with --source.
+
+linz_resource_zip_prefix: "lds-new-zealand-7layers-GTiff-JPEG-SHP"
+
+# Layer folders are matched by the substring keyword below (region prefix + year suffix vary).
+resource_subdirs:
+  aerial:
+    pattern: "urban-aerial-photos"   # resolution (0075m/01m) + year vary; substring match
+    file_glob: "*.jpg"
+    sidecars: [".jgw", ".aux.xml", ".xml"]
+  dsm:
+    pattern: "lidar-1m-dsm"          # region-specific prefix + year suffix; substring match
+    file_glob: "*.tif"
+    sidecars: [".aux", ".aux.xml", ".tfw", ".xml"]
+  dem:
+    pattern: "lidar-1m-dem"          # excludes survey-index via migrate claimed-set logic
+    file_glob: "*.tif"
+    sidecars: [".aux", ".aux.xml", ".tfw", ".xml"]
+  survey_index:
+    pattern: "new-zealand-lidar-1m-dem-survey-index"
+    file_glob: "*.shp"
+    sidecars: [".dbf", ".shx", ".prj", ".cpg", ".xml"]
+  buildings:
+    pattern: "nz-building-outlines"
+    file_glob: "*.shp"
+    sidecars: [".dbf", ".shx", ".prj", ".cpg", ".xml"]
+  property_boundaries:
+    pattern: "nz-property-boundaries"
+    file_glob: "*.shp"
+    sidecars: [".dbf", ".shx", ".prj", ".cpg", ".xml", "-data-dictionary.pdf"]
+  roads:
+    pattern: "nz-road-centrelines-topo-150k"
+    file_glob: "*.shp"
+    sidecars: [".dbf", ".shx", ".prj", ".cpg", ".xml"]
+
+# Where each layer lands in data/raw/<city>/
+data_layout:
+  aerial:
+    subdir: "aerial/{year}"        # e.g., aerial/2025/
+  dsm:
+    subdir: "dsm"
+  dem:
+    subdir: "dem"
+  survey_index:
+    subdir: "survey_index"
+  buildings:
+    subdir: "buildings"
+  property_boundaries:
+    subdir: "property_boundaries"
+  roads:
+    subdir: "roads"
+
+expected_aerial_years:
+  christchurch: ["2015-2016", "2018", "2025"]
+  wellington: []                   # fill in after download
+  tauranga: ["2025"]               # replaces hamilton (2026-05-30); matched to LiDAR 2025
+  auckland: []

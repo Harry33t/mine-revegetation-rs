@@ -1,0 +1,35 @@
+# Global processing constants — applied uniformly to all cities.
+# These are locked-in from research-design-memo §4 and §14.
+
+target_crs: "EPSG:2193"           # NZTM2000 — all NZ data native to this
+working_pixel_size_m: 0.3          # downsample 0.075m aerial to 0.3m for cross-city comparability
+tile_size_px: 512                  # 512 * 0.3 = 153.6 m
+tile_size_m: 153.6
+spatial_cv:
+  block_size_m: 1000               # 1km blocks for within-city CV
+  buffer_tiles: 1                  # >= 1 tile gap between train and test blocks
+resampling:
+  imagery: "bilinear"
+  elevation: "bilinear"             # for DSM/DTM
+  mask: "nearest"                  # for categorical layers
+chm:
+  thresholds_m: [2.0, 3.0, 5.0]    # pseudo-label candidates; main = 2.0
+  building_buffer_m: 1.0           # buffer around building polygons before masking out
+  min_canopy_area_m2: 4.0          # remove specks smaller than this after thresholding
+  exg_threshold: 0.0               # per-pixel aerial greenness gate: drop tall non-green pixels (roofs footprint missed)
+  roof_exg_threshold: 0.04         # per-component gate: drop whole blobs whose median ExG is roof-low
+  roof_min_area_m2: 40.0           # only suppress large low-green blobs (spare small shadowed trees)
+normalization:
+  strategy: "global_training_zscore"   # not per-city — see memo §4 rationale
+  # actual mean/std computed once at M4 startup over the training-city union
+
+paths:
+  data_root: "../data"             # relative to nz-urban-canopy/
+  raw_dir: "raw"
+  interim_dir: "interim"
+  processed_dir: "processed"
+  outputs_dir: "outputs"
+
+reproducibility:
+  random_seeds: [42, 137, 2024]
+  deterministic: true

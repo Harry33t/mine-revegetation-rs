@@ -1,0 +1,42 @@
+[
+  {
+    "name": "alcoa_huntly",
+    "label": "Alcoa Huntly bauxite rehab (WA, jarrah forest)",
+    "track": "satellite",
+    "lon": 116.115,
+    "lat": -32.56,
+    "mineral": "bauxite"
+  },
+  {
+    "name": "ranger",
+    "label": "Ranger uranium mine rehab (NT, Kakadu enclave)",
+    "track": "satellite",
+    "lon": 132.93,
+    "lat": -12.68,
+    "mineral": "uranium"
+  },
+  {
+    "name": "mt_owen",
+    "label": "Mt Owen / Ravensworth coal rehab (NSW, Hunter Valley)",
+    "track": "satellite",
+    "lon": 151.115,
+    "lat": -32.41,
+    "mineral": "coal"
+  },
+  {
+    "name": "iluka_eneabba",
+    "label": "Iluka Eneabba mineral sands rehab (WA)",
+    "track": "satellite",
+    "lon": 115.3,
+    "lat": -29.8,
+    "mineral": "mineral_sands"
+  },
+  {
+    "name": "tauranga_bridge",
+    "label": "Tauranga (NZ) \u2014 co-located LINZ aerial + 1m LiDAR + Sentinel-2",
+    "track": "bridge",
+    "lon": 176.17,
+    "lat": -37.7,
+    "mineral": ""
+  }
+]

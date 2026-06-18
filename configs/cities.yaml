@@ -1,0 +1,133 @@
+# Per-city configuration.
+# AOI re-selection in progress (2026-05-30): moving all 4 cities to
+# representative BUILT-UP AOIs (old Day-0 park-biased AOIs superseded).
+# Hamilton -> Tauranga swap (2026-05-30): Hamilton LiDAR only 2023 vs 2025
+# aerial (vintage gap); Tauranga has matched 2025 LiDAR + 2025 aerial.
+# City list: Christchurch / Wellington(Hutt) / Tauranga / Auckland.
+#   christchurch = CBD + St Albans/Avonside (built-up; Hagley on W edge)
+#   wellington   = Lower Hutt CBD + Waterloo (+ E valley steep-slope bush)
+#   tauranga     = Tauranga CBD + Otumoetai + Greerton (built-up; NOT Mt Maunganui beach)
+#   auckland     = Mt Eden / Epsom inner suburbs by One Tree Hill
+# Read this file as UTF-8.
+
+christchurch:
+  city_name: "Christchurch"
+  region: "canterbury"
+  target_crs: "EPSG:2193"
+  status: "active"
+  notes: |
+    AOI (2026-05-30 re-download): central built-up - CBD (Cathedral Sq /
+    Colombo St) + St Albans / Avonside inner residential, Hagley Park on the
+    W edge. Supersedes the Day-0 BX24 (Hagley Park North) park-biased crop.
+    LiDAR survey: canterbury-christchurch 2024-2025 (flown 2024-12 to 2025-01).
+    Aerial 2025 is the time-matched pair. 216 tiles, 5.10 km2.
+  raw_dir: "christchurch"            # relative to data/raw/
+  primary_aerial_year: "2025"        # matched to LiDAR
+  available_aerial_years: ["2025"]   # this AOI download is 2025 only
+  lidar_survey_id: "canterbury-christchurch_2024-2025"
+  lidar_survey_dates:
+    flown_from: "2024-12-10"
+    flown_to: "2025-01-20"
+  aoi_bounds_nztm: [1569897, 5179408, 1572662, 5181251]   # xmin ymin xmax ymax (EPSG:2193)
+  aoi_bounds_wgs84: [172.6274, -43.5377, 172.6617, -43.5212]  # lon/lat min,max
+  test_tile_ids: []                  # set after M1 on the new AOI
+  sample_strategy: "stratified_by_canopy_density"
+  hard_negative_categories:
+    - "high_density_urban"
+    - "suburban"
+    - "park"
+    - "industrial"
+    - "mixed"
+  output_dir: "christchurch"
+
+wellington:
+  city_name: "Wellington"
+  region: "wellington"
+  target_crs: "EPSG:2193"
+  status: "active"
+  notes: |
+    AOI (2026-05-30 re-download): Lower Hutt CBD + Waterloo/Epuni inner
+    residential, E edge clips the Hutt Valley steep bush slope. Supersedes
+    the Day-0 Avalon Park crop. Aerial 2025 + LiDAR 2025 matched pair.
+    Domain-shift city: 38 steep tiles confirmed real native bush (raw 87.6%
+    -> final 81.0% canopy), NOT a CHM/DSM-DEM artifact (M2.1 slope audit).
+    216 tiles (197 non-empty), 5.10 km2.
+  raw_dir: "wellington"
+  primary_aerial_year: "2025"        # matched to LiDAR
+  available_aerial_years: ["2025"]
+  lidar_survey_id: "wellington-hutt-city_2025"
+  lidar_survey_dates: null           # no survey-index dates in regional product
+  aoi_bounds_nztm: [1760018, 5434477, 1762783, 5436320]
+  aoi_bounds_wgs84: [174.9091, -41.2253, 174.9416, -41.2081]
+  test_tile_ids: []
+  sample_strategy: "stratified_by_canopy_density"
+  hard_negative_categories:
+    - "steep_slope"
+    - "high_density_urban"
+    - "suburban"
+    - "harbour_edge"
+    - "park"
+  output_dir: "wellington"
+
+tauranga:
+  city_name: "Tauranga"
+  region: "bay-of-plenty"
+  target_crs: "EPSG:2193"
+  status: "active"                  # replaces Hamilton (2026-05-30); downloaded + M1/M2/M2.1 done
+  notes: |
+    REPLACES Hamilton (2026-05-30). Downloaded + processed: 252 tiles, 5.95 km2.
+    Reason: Hamilton LiDAR was only 2023
+    against 2025 aerial (~1-2 year vintage gap that adds label noise);
+    Tauranga has LiDAR 1m DSM/DEM 2025 AND aerial 2025 -> matched 0-year
+    pair, cleaner CHM weak labels. Tauranga (Bay of Plenty) is a coastal,
+    subtropical, fast-growing North Island city; it fills the same
+    "North Island mid-sized city" slot as Hamilton but gives a stronger
+    climate/vegetation domain shift vs Christchurch (South Island temperate
+    plains). City list is now: Christchurch / Wellington(Hutt) / Tauranga / Auckland.
+    AOI target: central built-up (Tauranga CBD peninsula + Otumoetai +
+    Gate Pa/Greerton residential + port-side industrial). AVOID the
+    Mount Maunganui beach/spit - built-up only.
+  raw_dir: "tauranga"
+  primary_aerial_year: "2025"        # matched to LiDAR 2025
+  available_aerial_years: ["2025"]   # confirm exact label on LINZ
+  lidar_survey_id: "bay-of-plenty-tauranga_2025"
+  lidar_survey_dates: null
+  aoi_bounds_nztm: [1875883, 5821501, 1879109, 5823344]
+  aoi_bounds_wgs84: [176.1297, -37.7122, 176.1655, -37.6947]
+  test_tile_ids: []
+  sample_strategy: "stratified_by_canopy_density"
+  hard_negative_categories:
+    - "high_density_urban"
+    - "suburban"
+    - "park"
+    - "industrial"
+    - "harbour_edge"
+  output_dir: "tauranga"
+
+auckland:
+  city_name: "Auckland"
+  region: "auckland"
+  target_crs: "EPSG:2193"
+  status: "active"
+  notes: |
+    AOI (2026-05-30 re-download): Mt Eden / Epsom / Sandringham inner-city
+    residential by One Tree Hill, with arterial commercial strips + park edge.
+    Supersedes the Day-0 One Tree Hill / Cornwall Park park crop. Aerial
+    2024-2025 vs LiDAR 2024 (part-1) -> ~0 year gap. part-1 coverage confirmed
+    over this AOI (no nodata holes). 247 tiles, 5.83 km2.
+  raw_dir: "auckland"
+  primary_aerial_year: "2024-2025"
+  available_aerial_years: ["2024-2025"]
+  lidar_survey_id: "auckland-part-1_2024"
+  lidar_survey_dates: null           # no survey-index dates in regional product
+  aoi_bounds_nztm: [1755018, 5914936, 1757936, 5916933]
+  aoi_bounds_wgs84: [174.7399, -36.8988, 174.7722, -36.8804]
+  test_tile_ids: []
+  sample_strategy: "stratified_sample_no_full_coverage"
+  hard_negative_categories:
+    - "high_density_urban"
+    - "suburban"
+    - "park"
+    - "industrial"
+    - "low_canopy"
+  output_dir: "auckland"

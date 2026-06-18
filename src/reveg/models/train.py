@@ -1,0 +1,224 @@
+"""Train weak-supervised segmentation.
+
+Modes:
+  label_efficiency  multi-seed-averaged mIoU vs labelled fraction (clean curve)
+  transfer          source->target cross-site mIoU matrix (LOCO generalisation)
+
+Also exports MC-dropout uncertainty triptychs + front-end JSON.
+GPU box. Set HF_ENDPOINT=https://hf-mirror.com for HF weights behind the GFW.
+
+    python -m reveg.models.train --mode label_efficiency --seeds 3 \
+        --sites data/processed/tiles/alcoa_huntly ... --epochs 30 --out outputs/seg
+    python -m reveg.models.train --mode transfer \
+        --sites data/processed/tiles/alcoa_huntly ... --epochs 30 --out outputs/loco
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import numpy as np
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+
+from .dataset import IGNORE_INDEX, NUM_CLASSES, TRAIN_CLASS_NAMES, TileDataset
+from .segmenter import build_segformer, build_unet, forward_logits, predict_with_uncertainty
+
+
+def seed_all(s: int) -> None:
+    import random
+    random.seed(s); np.random.seed(s); torch.manual_seed(s); torch.cuda.manual_seed_all(s)
+
+
+def confusion(pred, target, k):
+    cm = np.zeros((k, k), dtype="int64")
+    valid = target != IGNORE_INDEX
+    np.add.at(cm, (target[valid].ravel(), pred[valid].ravel()), 1)
+    return cm
+
+
+def iou_from_cm(cm):
+    ious = []
+    for i in range(cm.shape[0]):
+        tp = cm[i, i]
+        denom = cm[i, :].sum() + cm[:, i].sum() - tp
+        ious.append(float(tp) / denom if denom else float("nan"))
+    return float(np.nanmean(ious)), ious
+
+
+def evaluate(model, loader, device, k=NUM_CLASSES):
+    model.eval()
+    cm = np.zeros((k, k), dtype="int64")
+    with torch.no_grad():
+        for x, y in loader:
+            pred = forward_logits(model, x.to(device)).argmax(1).cpu().numpy()
+            cm += confusion(pred, y.numpy(), k)
+    return iou_from_cm(cm)
+
+
+def train_fixed(model, train_ds, device, *, epochs=30, bs=16, lr=6e-4):
+    model.to(device)
+    tl = DataLoader(train_ds, batch_size=bs, shuffle=True, num_workers=2)
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    loss_fn = nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX)
+    for _ in range(epochs):
+        model.train()
+        for x, y in tl:
+            opt.zero_grad()
+            loss_fn(forward_logits(model, x.to(device)), y.to(device)).backward()
+            opt.step()
+    return model
+
+
+def run_label_efficiency(sites, builder, fractions, epochs, val_frac, seeds, device):
+    ids = sorted(TileDataset(sites).all_ids())
+    rng = np.random.default_rng(2026); rng.shuffle(ids)
+    n_val = int(len(ids) * val_frac)
+    val_ids, train_all = set(ids[:n_val]), ids[n_val:]
+    val_ds = TileDataset(sites, ids=val_ids)
+    vl = DataLoader(val_ds, batch_size=16)
+    print(f"label_efficiency: train_pool={len(train_all)} val={len(val_ids)} seeds={seeds}")
+
+    curve = []
+    for frac in fractions:
+        n = max(1, int(round(len(train_all) * frac)))
+        mious = []
+        for s in range(seeds):
+            seed_all(1000 + s)
+            order = list(train_all); np.random.default_rng(1000 + s).shuffle(order)
+            train_ds = TileDataset(sites, ids=set(order[:n]), augment=True)
+            model = builder()
+            train_fixed(model, train_ds, device, epochs=epochs)
+            mi, _ = evaluate(model, vl, device)
+            mious.append(mi)
+            del model; torch.cuda.empty_cache()
+        curve.append({"fraction": frac, "n_train": n,
+                      "miou_mean": float(np.mean(mious)), "miou_std": float(np.std(mious)),
+                      "miou_seeds": [float(m) for m in mious]})
+        print(f"  frac={frac:<5} n={n:<4} mIoU={np.mean(mious):.3f}±{np.std(mious):.3f}")
+    return curve, val_ds
+
+
+def run_transfer(sites, builder, epochs, device, seeds=1):
+    names = [Path(s).name for s in sites]
+    n = len(sites)
+    acc = np.zeros((seeds, n, n))
+    sample_model = None
+    for s_idx in range(seeds):
+        models = {}
+        for src in sites:
+            seed_all(2026 + s_idx)
+            models[src] = train_fixed(builder(), TileDataset(src, augment=True), device, epochs=epochs)
+        sample_model = sample_model or models[sites[0]]
+        for i, src in enumerate(sites):
+            for j, tgt in enumerate(sites):
+                mi, _ = evaluate(models[src], DataLoader(TileDataset(tgt), batch_size=16), device)
+                acc[s_idx, i, j] = mi
+        print(f"  seed {s_idx} done")
+        del models
+        if device == "cuda":
+            torch.cuda.empty_cache()
+    matrix = acc.mean(axis=0)
+    std = acc.std(axis=0)
+    for i in range(n):
+        print(f"  src={names[i]:<14} -> " + ", ".join(f"{nm}:{matrix[i,k]:.2f}" for k, nm in enumerate(names)))
+    return names, matrix, std, sample_model
+
+
+def main():
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--mode", choices=["label_efficiency", "transfer"], default="label_efficiency")
+    ap.add_argument("--sites", nargs="+", required=True)
+    ap.add_argument("--model", choices=["segformer", "unet"], default="segformer")
+    ap.add_argument("--fractions", default="0.05,0.1,0.25,1.0")
+    ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--epochs", type=int, default=30)
+    ap.add_argument("--val-frac", type=float, default=0.25)
+    ap.add_argument("--out", default="outputs/seg")
+    args = ap.parse_args()
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
+    builder = build_segformer if args.model == "segformer" else build_unet
+    print(f"device={device} model={args.model} mode={args.mode}")
+
+    if args.mode == "label_efficiency":
+        fractions = [float(f) for f in args.fractions.split(",")]
+        curve, val_ds = run_label_efficiency(args.sites, builder, fractions, args.epochs,
+                                             args.val_frac, args.seeds, device)
+        (out / "label_efficiency.json").write_text(json.dumps(curve, indent=2))
+        _plot_curve(curve, out / "label_efficiency.png")
+        # final full-data model for uncertainty samples
+        seed_all(0)
+        full = train_fixed(builder(), TileDataset(args.sites, augment=True), device, epochs=args.epochs)
+        _export_uncertainty(full, val_ds, device, out)
+    else:
+        names, matrix, std, sample_model = run_transfer(args.sites, builder, args.epochs, device, seeds=args.seeds)
+        (out / "transfer_matrix.json").write_text(json.dumps(
+            {"sites": names, "matrix": matrix.tolist(), "std": std.tolist(), "seeds": args.seeds}, indent=2))
+        _plot_matrix(names, matrix, out / "transfer_matrix.png")
+    print(f"artifacts -> {out}")
+
+
+def _plot_curve(curve, path):
+    import matplotlib; matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fr = [c["fraction"] * 100 for c in curve]
+    mi = [c["miou_mean"] for c in curve]
+    sd = [c["miou_std"] for c in curve]
+    fig, ax = plt.subplots(figsize=(7, 5))
+    ax.errorbar(fr, mi, yerr=sd, fmt="o-", color="#1b7837", capsize=4)
+    ax.set_xscale("log"); ax.set_xlabel("labelled fraction (%)"); ax.set_ylabel("validation mIoU")
+    ax.set_title("label-efficiency (mean ± std over seeds)")
+    ax.grid(True, which="both", alpha=0.3)
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
+def _plot_matrix(names, matrix, path):
+    import matplotlib; matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(6, 5))
+    im = ax.imshow(matrix, cmap="viridis", vmin=0, vmax=1)
+    ax.set_xticks(range(len(names))); ax.set_xticklabels(names, rotation=30, ha="right")
+    ax.set_yticks(range(len(names))); ax.set_yticklabels(names)
+    ax.set_xlabel("test site"); ax.set_ylabel("train site")
+    ax.set_title("cross-site transfer mIoU (LOCO)")
+    for i in range(len(names)):
+        for j in range(len(names)):
+            ax.text(j, i, f"{matrix[i,j]:.2f}", ha="center", va="center",
+                    color="white" if matrix[i, j] < 0.6 else "black")
+    fig.colorbar(im, ax=ax, fraction=0.046)
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
+def _export_uncertainty(model, val_ds, device, out, n=6):
+    import matplotlib; matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from ..labels.classes import CLASS_COLORS
+    from .dataset import LABEL_REMAP
+    inv = {v: k for k, v in LABEL_REMAP.items()}
+    (out / "samples").mkdir(parents=True, exist_ok=True)
+    model.to(device)
+    for i in range(min(n, len(val_ds))):
+        x, _ = val_ds[i]
+        pred, ent = predict_with_uncertainty(model, x.unsqueeze(0).to(device), passes=20)
+        pred = pred[0].cpu().numpy(); ent = ent[0].cpu().numpy()
+        rgb = np.clip(np.moveaxis(x.numpy()[:3], 0, -1) * 3.0, 0, 1)
+        col = np.zeros((*pred.shape, 3), "uint8")
+        for ti, wid in inv.items():
+            col[pred == ti] = CLASS_COLORS[wid]
+        fig, axs = plt.subplots(1, 3, figsize=(13, 4.5))
+        axs[0].imshow(rgb); axs[0].set_title("S2 RGB"); axs[0].axis("off")
+        axs[1].imshow(col); axs[1].set_title("prediction"); axs[1].axis("off")
+        im = axs[2].imshow(ent, cmap="inferno", vmin=0, vmax=1)
+        axs[2].set_title("MC-dropout uncertainty"); axs[2].axis("off")
+        fig.colorbar(im, ax=axs[2], fraction=0.046)
+        fig.tight_layout(); fig.savefig(out / "samples" / f"sample_{i}.png", dpi=120); plt.close(fig)
+
+
+if __name__ == "__main__":
+    main()
