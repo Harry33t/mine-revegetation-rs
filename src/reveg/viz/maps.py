@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ..labels import classes as C
+from .style import apply as _apply_style
+
+_apply_style()
 
 
 def s2_rgb(composite, *, bands=("B04", "B03", "B02"), pclip=(2, 98)) -> np.ndarray:

@@ -9,6 +9,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from .style import apply as _apply_style
+
+_apply_style()
+
 
 def scatter_xy(x, y, path: str | Path, *, xlabel="", ylabel="", title=None, r=None) -> Path:
     """Scatter of two aligned arrays (e.g. canopy-cover fraction vs S2 NDVI)."""

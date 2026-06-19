@@ -11,6 +11,7 @@ import {
 import SiteMap from "./SiteMap";
 import Canopy3D from "./Canopy3D";
 import UncertaintyGallery from "./UncertaintyGallery";
+import BeforeAfter from "./BeforeAfter";
 
 const AXIS = "#5d5d57";
 const GRID = "#e2e0d6";
@@ -219,6 +220,9 @@ export default function App() {
           footprint (2019&ndash;2024). Pixels are selected by their 2019 state only, so the trend is
           not selection-on-outcome.
         </p>
+        <BeforeAfter />
+        <p className="cap">Same ground in 2019 vs. 2024 over the strongest-recovery window at Alcoa
+          Huntly — drag to compare (true colour or NDVI).</p>
         {trajKeys.length > 0 && (
           <label className="select">
             site:&nbsp;
