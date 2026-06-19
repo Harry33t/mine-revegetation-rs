@@ -26,6 +26,9 @@ body {
   font-size: 27px; font-weight: 650; line-height: 1.25; letter-spacing: -0.01em;
   margin: 0 0 12px; max-width: 24ch;
 }
+.hero .author { margin: 0 0 14px; color: var(--text); font-size: 15px; }
+.hero .author a { color: var(--accent); text-decoration: none; }
+.hero .author a:hover { text-decoration: underline; }
 .hero .sub { color: var(--muted); max-width: 68ch; font-size: 16px; margin: 0; }
 .hero-3d { display: grid; grid-template-columns: 1.25fr 1fr; gap: 28px; align-items: center; }
 .hero-text { min-width: 0; }

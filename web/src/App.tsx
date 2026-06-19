@@ -111,6 +111,11 @@ export default function App() {
       <header className="hero hero-3d">
         <div className="hero-text">
           <h1>Weak-supervised revegetation monitoring for mine rehabilitation</h1>
+          <p className="author">
+            <strong>Guanxiong Huang</strong> · Northwest A&amp;F University ·{" "}
+            <a href="mailto:harry.huang@nwafu.edu.cn">harry.huang@nwafu.edu.cn</a> ·{" "}
+            <a href="https://github.com/Harry33t/mine-revegetation-rs">code</a>
+          </p>
           <p className="sub">
             Vegetation classes (bare, water, senescent, vegetation) are mapped on rehabilitating
             Australian mine sites from Sentinel-2 imagery using weak, self-supervised labels. The

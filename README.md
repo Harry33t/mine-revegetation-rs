@@ -5,6 +5,8 @@ segmentation of vegetation classes from Sentinel-2 over rehabilitating Australia
 mine sites, with multi-temporal restoration trajectories, a fine-scale
 structure comparison, cross-site transfer, and per-pixel uncertainty.
 
+**Guanxiong Huang** · Northwest A&F University · harry.huang@nwafu.edu.cn
+
 **Live demo:** https://harry33t.github.io/mine-revegetation-rs/
 
 ## Motivation
