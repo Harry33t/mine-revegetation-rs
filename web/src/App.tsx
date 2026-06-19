@@ -276,9 +276,12 @@ export default function App() {
       </Section>
 
       <footer className="foot">
+        <p><strong>Guanxiong Huang</strong>, Northwest A&amp;F University ·{" "}
+          <a href="mailto:harry.huang@nwafu.edu.cn">harry.huang@nwafu.edu.cn</a> ·{" "}
+          <a href="https://github.com/Harry33t/mine-revegetation-rs">source code</a></p>
         <p>Open data: Sentinel-2 surface reflectance (Microsoft Planetary Computer), Meta global
-          canopy height, ESA WorldCover. Methods: SegFormer-B0, MC-dropout uncertainty,
-          leave-one-site-out cross-validation. This page summarises work in progress.</p>
+          canopy height, ESA WorldCover. Methods: SegFormer-B0, self-training, MC-dropout
+          uncertainty, leave-one-site-out cross-validation. Work in progress.</p>
       </footer>
     </div>
   );
