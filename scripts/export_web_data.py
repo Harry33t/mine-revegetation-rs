@@ -85,6 +85,9 @@ def main():
     val = ROOT / "outputs" / "validation_worldcover.json"
     if val.exists():
         (DATA / "validation.json").write_text(val.read_text())
+    st = ROOT / "outputs" / "selftrain" / "self_training.json"
+    if st.exists():
+        (DATA / "self_training.json").write_text(st.read_text())
     manifest = {
         "assets": assets,
         "trajectories": sorted(traj.keys()),

@@ -4,8 +4,9 @@ import {
   Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
-  loadLabelEfficiency, loadTrajectories, loadTransferMatrix, loadValidation,
-  prettySite, type LabelEffPoint, type TrajectoryPoint, type TransferMatrix, type Validation,
+  loadLabelEfficiency, loadSelfTraining, loadTrajectories, loadTransferMatrix, loadValidation,
+  prettySite, type LabelEffPoint, type SelfTraining, type TrajectoryPoint,
+  type TransferMatrix, type Validation,
 } from "./data";
 import SiteMap from "./SiteMap";
 import Canopy3D from "./Canopy3D";
@@ -78,10 +79,12 @@ export default function App() {
   const [labelEff, setLabelEff] = useState<LabelEffPoint[] | null>(null);
   const [loco, setLoco] = useState<TransferMatrix | null>(null);
   const [val, setVal] = useState<Validation | null>(null);
+  const [self, setSelf] = useState<SelfTraining | null>(null);
   const [site, setSite] = useState<string>("");
 
   useEffect(() => {
     loadValidation().then(setVal).catch(() => setVal(null));
+    loadSelfTraining().then(setSelf).catch(() => setSelf(null));
     loadTrajectories().then((t) => {
       setTraj(t);
       const rehab = Object.keys(t).filter((k) => k.includes("rehab"));
@@ -178,6 +181,35 @@ export default function App() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        )}
+        {self && self.rows.length > 0 && (
+          <>
+            <p className="lead" style={{ marginTop: 18 }}>
+              <strong>Self-training.</strong> At small label budgets the unused tiles are treated as
+              unlabelled; confidence-thresholded (≥ {self.conf_threshold}) pseudo-labels from the
+              supervised model are added and the model retrained. The benefit is largest when labels
+              are scarcest and saturates as labels increase.
+            </p>
+            <table className="data">
+              <caption>Supervised-only vs. self-training (validation mIoU).</caption>
+              <thead>
+                <tr><th>Labelled fraction</th><th>Labelled tiles</th><th>Supervised</th><th>Self-training</th><th>Δ</th></tr>
+              </thead>
+              <tbody>
+                {self.rows.map((r) => (
+                  <tr key={r.fraction}>
+                    <td>{(r.fraction * 100).toFixed(0)}%</td>
+                    <td>{r.n_labeled}</td>
+                    <td>{r.miou_supervised.toFixed(3)}</td>
+                    <td>{r.miou_self_training.toFixed(3)}</td>
+                    <td style={{ color: r.gain > 0 ? GREEN : "#999" }}>
+                      {r.gain >= 0 ? "+" : ""}{r.gain.toFixed(3)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </Section>
 

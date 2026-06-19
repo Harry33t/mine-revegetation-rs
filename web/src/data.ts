@@ -69,6 +69,13 @@ export interface Validation {
   year: string;
 }
 export const loadValidation = () => getJSON<Validation>("validation.json");
+
+export interface SelfTrainRow {
+  fraction: number; n_labeled: number;
+  miou_supervised: number; miou_self_training: number; gain: number;
+}
+export interface SelfTraining { rows: SelfTrainRow[]; conf_threshold: number; }
+export const loadSelfTraining = () => getJSON<SelfTraining>("self_training.json");
 export const loadTrajectories = () =>
   getJSON<Record<string, TrajectoryPoint[]>>("trajectories.json");
 export const loadLabelEfficiency = () => getJSON<LabelEffPoint[]>("label_efficiency.json");

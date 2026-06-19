@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "fraction": 0.05,
+      "n_labeled": 8,
+      "miou_supervised": 0.48,
+      "miou_self_training": 0.516,
+      "gain": 0.036
+    },
+    {
+      "fraction": 0.1,
+      "n_labeled": 16,
+      "miou_supervised": 0.501,
+      "miou_self_training": 0.525,
+      "gain": 0.024
+    },
+    {
+      "fraction": 0.25,
+      "n_labeled": 40,
+      "miou_supervised": 0.513,
+      "miou_self_training": 0.508,
+      "gain": -0.005
+    }
+  ],
+  "conf_threshold": 0.8
+}
