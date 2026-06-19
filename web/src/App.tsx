@@ -112,7 +112,8 @@ export default function App() {
         <div className="hero-text">
           <h1>Weak-supervised revegetation monitoring for mine rehabilitation</h1>
           <p className="author">
-            <strong>Guanxiong Huang</strong> · Northwest A&amp;F University ·{" "}
+            <strong>Guanxiong Huang</strong><br />
+            <span className="affil">Northwest A&amp;F University</span> ·{" "}
             <a href="mailto:harry.huang@nwafu.edu.cn">harry.huang@nwafu.edu.cn</a> ·{" "}
             <a href="https://github.com/Harry33t/mine-revegetation-rs">code</a>
           </p>
